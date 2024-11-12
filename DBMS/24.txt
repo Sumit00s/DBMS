@@ -1,0 +1,65 @@
+Design and Implement following query using MongoDB
+1. Create a collection called ‘games’.
+2. Add 5 games to the database. Give each document the following properties:
+name, gametype, rating (out of 100)
+3. Write a query that returns all the games
+4. Write a query that returns the 3 highest rated games.
+5. Update your two favourite games to have two achievements called ‘Game
+Master’ and ‘Speed Demon’.
+6. Write a query that returns all the games that have both the ‘Game Maser’ and
+7. the ‘Speed Demon’ achievements.
+8. Write a query that returns only games that have achievements.
+
+Step 1: Create a Collection Called ‘games’
+In the MongoDB shell or a MongoDB client, switch to your database and create the collection games by inserting documents into it.
+
+Step 2: Add 5 Games to the Database
+Add 5 game documents with name, gametype, and rating fields. Here’s an example of how to add these games:
+
+javascript
+Copy code
+db.games.insertMany([
+  { name: "Game A", gametype: "Action", rating: 85 },
+  { name: "Game B", gametype: "Adventure", rating: 92 },
+  { name: "Game C", gametype: "Puzzle", rating: 78 },
+  { name: "Game D", gametype: "RPG", rating: 90 },
+  { name: "Game E", gametype: "Sports", rating: 88 }
+]);
+Step 3: Query to Return All Games
+Retrieve all games using the following query:
+
+javascript
+Copy code
+db.games.find();
+Step 4: Query to Return the 3 Highest Rated Games
+To get the 3 highest-rated games, sort by rating in descending order and limit the result to 3:
+
+javascript
+Copy code
+db.games.find().sort({ rating: -1 }).limit(3);
+Step 5: Update Your Two Favorite Games with Achievements
+Choose two games, say "Game A" and "Game B", and add achievements to them. Use the $set operator to add an achievements array with the values "Game Master" and "Speed Demon".
+
+javascript
+Copy code
+db.games.updateOne(
+  { name: "Game A" },
+  { $set: { achievements: ["Game Master", "Speed Demon"] } }
+);
+
+db.games.updateOne(
+  { name: "Game B" },
+  { $set: { achievements: ["Game Master", "Speed Demon"] } }
+);
+Step 6: Query to Return Games with Both ‘Game Master’ and ‘Speed Demon’ Achievements
+To find games that contain both achievements, use the $all operator with the achievements array:
+
+javascript
+Copy code
+db.games.find({ achievements: { $all: ["Game Master", "Speed Demon"] } });
+Step 7: Query to Return Only Games That Have Achievements
+To find only games that have an achievements field, use the $exists operator:
+
+javascript
+Copy code
+db.games.find({ achievements: { $exists: true } });

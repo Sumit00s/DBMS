@@ -1,0 +1,125 @@
+
+
+1. Create a db called company consist of the following tables.
+1.Emp (eno,ename, job,hiredate,salary,commission,deptno,)
+2.dept(deptno,deptname,location)
+eno is primary key in emp
+deptno is primary key in dept
+Solve Queries by SQL
+1. List the maximum salary paid to salesman
+2. List name of emp whose name start with ‘I’
+3. List details of emp who have joined before ’30-sept-81’
+4. List the emp details in the descending order of their basic salary
+5. List of no. of emp & avg salary for emp in the dept no ‘20’
+6. List the avg salary, minimum salary of the emp hiredatewise for dept no ‘10’.
+7. List emp name and its department
+8. List total salary paid to each department
+9. List details of employee working in ‘Dev’ department
+10. Update salary of all employees in deptno 10 by 5 %.
+
+-- Create the database
+CREATE DATABASE company;
+
+-- Use the company database
+USE company;
+
+-- Create the dept table
+CREATE TABLE dept (
+    deptno INT PRIMARY KEY,
+    deptname VARCHAR(50),
+    location VARCHAR(50)
+);
+
+-- Create the emp table
+CREATE TABLE emp (
+    eno INT PRIMARY KEY,
+    ename VARCHAR(50),
+    job VARCHAR(50),
+    hiredate DATE,
+    salary DECIMAL(10, 2),
+    commission DECIMAL(10, 2),
+    deptno INT,
+    FOREIGN KEY (deptno) REFERENCES dept(deptno)
+);
+
+
+-- Insert sample data into the dept table
+INSERT INTO dept (deptno, deptname, location) VALUES
+(10, 'Sales', 'New York'),
+(20, 'Marketing', 'Chicago'),
+(30, 'Development', 'San Francisco'),
+(40, 'Dev', 'Boston');
+
+-- Insert sample data into the emp table
+INSERT INTO emp (eno, ename, job, hiredate, salary, commission, deptno) VALUES
+(1, 'Alice', 'salesman', '1980-01-15', 5000, 200, 10),
+(2, 'Bob', 'manager', '1981-06-10', 6000, NULL, 20),
+(3, 'Charlie', 'clerk', '1981-09-29', 3000, NULL, 20),
+(4, 'David', 'salesman', '1982-03-12', 5500, 150, 10),
+(5, 'Eve', 'analyst', '1983-07-22', 4000, NULL, 30),
+(6, 'Irene', 'developer', '1984-02-15', 4500, NULL, 30),
+(7, 'Ivy', 'salesman', '1981-05-25', 5200, 300, 10),
+(8, 'Frank', 'clerk', '1980-08-14', 2900, NULL, 40),
+(9, 'Grace', 'developer', '1983-12-18', 3800, NULL, 40);
+
+
+Solving Queries
+
+SELECT MAX(salary) AS max_salary
+FROM emp
+WHERE job = 'salesman';
+List name of employees whose name starts with ‘I’
+
+SELECT ename
+FROM emp
+WHERE ename LIKE 'I%';
+List details of employees who joined before ’30-sept-81’
+
+
+SELECT *
+FROM emp
+WHERE hiredate < '1981-09-30';
+List the employee details in the descending order of their salary
+
+SELECT *
+FROM emp
+ORDER BY salary DESC;
+List the number of employees and average salary for employees in dept no ‘20’
+
+
+SELECT COUNT(*) AS no_of_emp, AVG(salary) AS avg_salary
+FROM emp
+WHERE deptno = 20;
+List the average salary and minimum salary of employees, hiredate-wise, for dept no ‘10’
+
+
+SELECT hiredate, AVG(salary) AS avg_salary, MIN(salary) AS min_salary
+FROM emp
+WHERE deptno = 10
+GROUP BY hiredate;
+List employee names and their departments
+
+
+SELECT e.ename, d.deptname
+FROM emp e
+JOIN dept d ON e.deptno = d.deptno;
+List the total salary paid to each department
+
+
+SELECT d.deptname, SUM(e.salary) AS total_salary
+FROM emp e
+JOIN dept d ON e.deptno = d.deptno
+GROUP BY d.deptname;
+List details of employees working in the ‘Dev’ department
+
+
+SELECT e.*
+FROM emp e
+JOIN dept d ON e.deptno = d.deptno
+WHERE d.deptname = 'Dev';
+Update salary of all employees in deptno 10 by 5%
+
+
+UPDATE emp
+SET salary = salary * 1.05
+WHERE deptno = 10;

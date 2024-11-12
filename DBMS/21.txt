@@ -1,0 +1,121 @@
+21. Create Database DYPIT using MongoDB
+Create following Collections
+Teachers(Tname,dno,dname,experience,salary,date_of_joining )
+Students(Sname,roll_no,class)
+
+1. Find the information about all teachers
+2. Find the average salary teachers of computer department
+3. Find the minimum and maximum salary of e&TC department teachers
+4. Find the information about all teachers of computer,IT,and E&TC department having
+salary greate than or equl to 10000/-
+5. Find the student information having roll_no = 2 or Sname=xyz
+6. Update the experience of teacher-praveen to 10years, if the entry is not available in
+database consider the entry as new entry.
+7. Update the deparment of all the teachers working in IT deprtment to COMP
+8. find the teachers name and their experience from teachers collection
+9. Using Save() method insert one entry in department collection
+10. Find the total salary all teachers.
+
+
+
+
+
+
+Step 1: Create the Database and Collections
+Switch to the DYPIT database and create the required collections.
+
+javascript
+Copy code
+use DYPIT; // Switch to or create the DYPIT database
+
+// Sample data for Teachers collection
+db.Teachers.insertMany([
+    { Tname: "Praveen", dno: 101, dname: "COMP", experience: 5, salary: 30000, date_of_joining: new Date("2018-07-01") },
+    { Tname: "Rajesh", dno: 102, dname: "IT", experience: 7, salary: 28000, date_of_joining: new Date("2017-03-10") },
+    { Tname: "Anita", dno: 103, dname: "E&TC", experience: 6, salary: 26000, date_of_joining: new Date("2019-09-20") },
+    { Tname: "Mohan", dno: 104, dname: "COMP", experience: 8, salary: 32000, date_of_joining: new Date("2015-04-15") },
+    { Tname: "Kavita", dno: 105, dname: "IT", experience: 4, salary: 24000, date_of_joining: new Date("2020-01-12") }
+]);
+
+// Sample data for Students collection
+db.Students.insertMany([
+    { Sname: "John", roll_no: 1, class: "10th" },
+    { Sname: "xyz", roll_no: 25, class: "12th" }
+]);
+Queries
+Find the information about all teachers
+
+javascript
+Copy code
+db.Teachers.find();
+Find the average salary of teachers in the computer department
+
+javascript
+Copy code
+db.Teachers.aggregate([
+    { $match: { dname: "COMP" } },
+    { $group: { _id: "$dname", averageSalary: { $avg: "$salary" } } }
+]);
+Find the minimum and maximum salary of E&TC department teachers
+
+javascript
+Copy code
+db.Teachers.aggregate([
+    { $match: { dname: "E&TC" } },
+    {
+        $group: {
+            _id: "$dname",
+            minSalary: { $min: "$salary" },
+            maxSalary: { $max: "$salary" }
+        }
+    }
+]);
+Find the information about all teachers of computer, IT, and E&TC departments with salary >= 10000
+
+javascript
+Copy code
+db.Teachers.find({
+    dname: { $in: ["COMP", "IT", "E&TC"] },
+    salary: { $gte: 10000 }
+});
+Find the student information with roll_no = 2 or Sname = 'xyz'
+
+javascript
+Copy code
+db.Students.find({
+    $or: [{ roll_no: 2 }, { Sname: "xyz" }]
+});
+Update the experience of teacher Praveen to 10 years, or add if not exists
+
+javascript
+Copy code
+db.Teachers.updateOne(
+    { Tname: "Praveen" },
+    { $set: { experience: 10 } },
+    { upsert: true }
+);
+Update the department of all teachers in the IT department to COMP
+
+javascript
+Copy code
+db.Teachers.updateMany(
+    { dname: "IT" },
+    { $set: { dname: "COMP" } }
+);
+Find the teachers' names and their experience from the Teachers collection
+
+javascript
+Copy code
+db.Teachers.find({}, { Tname: 1, experience: 1, _id: 0 });
+Using save() method, insert one entry in Department collection
+
+javascript
+Copy code
+db.Department.save({ dname: "Mechanical", dno: 106 });
+Find the total salary of all teachers
+
+javascript
+Copy code
+db.Teachers.aggregate([
+    { $group: { _id: null, totalSalary: { $sum: "$salary" } } }
+]);

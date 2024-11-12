@@ -1,0 +1,114 @@
+22. Create Database DYPIT using MongoDB
+Create following Collections
+Teachers(Tname,dno,dname,experience,salary,date_of_joining )
+Students(Sname,roll_no,class)
+1. Display the department wise average salary
+2. display the no. Of employees working in each department
+3. Display the department wise total salary of departments having total salary greater than
+or equals to 50000/-
+4. Write the queries using the different operators like max, min. Etc.
+5. Create unique index on any field for above given collections
+6. Create compound index on any fields for above given collections
+7. Show all the indexes created in the database DYPIT
+8. Show all the indexes created in above collections.
+
+
+Step 1: Create the Database and Collections
+Switch to the DYPIT database and create the Teachers and Students collections with some sample data.
+
+javascript
+Copy code
+use DYPIT; // Switch to or create the DYPIT database
+
+// Sample data for Teachers collection
+db.Teachers.insertMany([
+    { Tname: "Praveen", dno: 101, dname: "COMP", experience: 5, salary: 30000, date_of_joining: new Date("2018-07-01") },
+    { Tname: "Rajesh", dno: 102, dname: "IT", experience: 7, salary: 28000, date_of_joining: new Date("2017-03-10") },
+    { Tname: "Anita", dno: 103, dname: "E&TC", experience: 6, salary: 26000, date_of_joining: new Date("2019-09-20") },
+    { Tname: "Mohan", dno: 104, dname: "COMP", experience: 8, salary: 32000, date_of_joining: new Date("2015-04-15") },
+    { Tname: "Kavita", dno: 105, dname: "IT", experience: 4, salary: 24000, date_of_joining: new Date("2020-01-12") }
+]);
+
+// Sample data for Students collection
+db.Students.insertMany([
+    { Sname: "John", roll_no: 1, class: "10th" },
+    { Sname: "xyz", roll_no: 25, class: "12th" }
+]);
+Queries
+Display the department-wise average salary
+
+javascript
+Copy code
+db.Teachers.aggregate([
+    { $group: { _id: "$dname", averageSalary: { $avg: "$salary" } } }
+]);
+Display the number of employees working in each department
+
+javascript
+Copy code
+db.Teachers.aggregate([
+    { $group: { _id: "$dname", employeeCount: { $sum: 1 } } }
+]);
+Display the department-wise total salary for departments having total salary >= 50000
+
+javascript
+Copy code
+db.Teachers.aggregate([
+    { $group: { _id: "$dname", totalSalary: { $sum: "$salary" } } },
+    { $match: { totalSalary: { $gte: 50000 } } }
+]);
+Write queries using different operators like $max, $min, etc.
+
+Find the maximum salary in each department:
+
+javascript
+Copy code
+db.Teachers.aggregate([
+    { $group: { _id: "$dname", maxSalary: { $max: "$salary" } } }
+]);
+Find the minimum salary in each department:
+
+javascript
+Copy code
+db.Teachers.aggregate([
+    { $group: { _id: "$dname", minSalary: { $min: "$salary" } } }
+]);
+Find the total and average salary across all departments:
+
+javascript
+Copy code
+db.Teachers.aggregate([
+    { $group: { _id: null, totalSalary: { $sum: "$salary" }, averageSalary: { $avg: "$salary" } } }
+]);
+Create a unique index on any field for the given collections
+
+Create a unique index on roll_no field in Students collection:
+javascript
+Copy code
+db.Students.createIndex({ roll_no: 1 }, { unique: true });
+Create a compound index on any fields for the given collections
+
+Create a compound index on dname and salary fields in Teachers collection:
+javascript
+Copy code
+db.Teachers.createIndex({ dname: 1, salary: -1 });
+Show all the indexes created in the DYPIT database
+
+javascript
+Copy code
+db.getCollectionNames().forEach(function(collection) {
+    print("Indexes in collection:", collection);
+    printjson(db[collection].getIndexes());
+});
+Show all the indexes created in the above collections
+
+Show all indexes in the Teachers collection:
+
+javascript
+Copy code
+db.Teachers.getIndexes();
+Show all indexes in the Students collection:
+
+javascript
+Copy code
+db.Students.getIndexes();

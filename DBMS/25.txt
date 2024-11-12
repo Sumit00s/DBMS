@@ -1,0 +1,79 @@
+Using MapReduce in mongodb solve following queries on given below collection.
+{
+“id” : 0,
+“name” : “Leanne Flinn”,
+“email” : “leanne.flinn@unilogic.com”,
+“work” :”Unilogic” ,
+“age” :27
+“gender” :”Male”
+“Salary” :16660
+“hobbies”:”Acrobatics,Photography,Papier-Mache”
+}
+1. Get the count of Males and Females
+2. Count the number of users in each hobby
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+use users  // Select the 'users' database
+
+// Insert sample data
+db.users.insertMany([
+    { "id": 0, "name": "Leanne Flinn", "email": "leanne.flinn@unilogic.com", "work": "Unilogic", "age": 27, "gender": "Male", "Salary": 16660, "hobbies": "Acrobatics,Photography,Papier-Mache" },
+    { "id": 1, "name": "Jane Doe", "email": "jane.doe@unilogic.com", "work": "Unilogic", "age": 30, "gender": "Female", "Salary": 18000, "hobbies": "Photography,Painting" },
+    { "id": 2, "name": "John Smith", "email": "john.smith@unilogic.com", "work": "Unilogic", "age": 35, "gender": "Male", "Salary": 20000, "hobbies": "Cycling,Photography" },
+    { "id": 3, "name": "Alice Brown", "email": "alice.brown@unilogic.com", "work": "Unilogic", "age": 22, "gender": "Female", "Salary": 15000, "hobbies": "Photography,Acrobatics" },
+    { "id": 4, "name": "Bob Johnson", "email": "bob.johnson@unilogic.com", "work": "Unilogic", "age": 28, "gender": "Male", "Salary": 19000, "hobbies": "Papier-Mache,Reading" }
+]);
+
+// 1. Count of Males and Females
+var mapFunction = function() {
+    emit(this.gender, 1);  // Emit gender with count of 1
+};
+
+var reduceFunction = function(key, values) {
+    return Array.sum(values);  // Sum the values (counts)
+};
+
+db.users.mapReduce(
+    mapFunction,
+    reduceFunction,
+    { out: "gender_count" }
+);
+
+db.gender_count.find();
+
+// 2. Count of users in each hobby
+var mapFunctionHobbies = function() {
+    var hobbiesList = this.hobbies.split(",");  // Split hobbies into an array
+    for (var i = 0; i < hobbiesList.length; i++) {
+        emit(hobbiesList[i].trim(), 1);  // Emit each hobby with count of 1
+    }
+};
+
+var reduceFunctionHobbies = function(key, values) {
+    return Array.sum(values);  // Sum the values (counts)
+};
+
+db.users.mapReduce(
+    mapFunctionHobbies,
+    reduceFunctionHobbies,
+    { out: "hobby_count" }
+);
+
+db.hobby_count.find();
